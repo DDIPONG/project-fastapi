@@ -54,6 +54,27 @@ jobs:
       - run:
           name: Build Docker image
           command: docker build -t project-fastapi .
+      - run:
+          name: Docker image save
+          command: docker save -o project-fastapi.tar project-fastapi
+      - persist_to_workspace:
+          root: .
+          paths:
+            - project-fastapi.tar
+  ecr-push:
+    machine:
+      image: ubuntu-2204:current
+
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Load Docker image
+          command: docker load -i project-fastapi.tar
+      - run:
+          name: Check OIDC token
+          command: |
+            echo "$CIRCLE_OIDC_TOKEN_V2" | cut -d '.' -f2 | base64 -d 2>/dev/null | jq .
 
 workflows:
   build-and-test:
@@ -65,3 +86,6 @@ workflows:
       - docker-build:
           requires:
             - test-python
+      - ecr-push:
+          requires:
+            - docker-build
