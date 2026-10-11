@@ -90,6 +90,16 @@ jobs:
               | docker login \
                   --username AWS \
                   --password-stdin 445960198177.dkr.ecr.ap-northeast-2.amazonaws.com
+      - run:
+          name: Tag Docker image
+          command: |
+            docker tag project-fastapi:latest \
+              445960198177.dkr.ecr.ap-northeast-2.amazonaws.com/project-fastapi:latest
+      - run:
+          name: Push Docker image to ECR
+          command: |
+            docker push \
+              445960198177.dkr.ecr.ap-northeast-2.amazonaws.com/project-fastapi:latest
 workflows:
   build-and-test:
     jobs:
