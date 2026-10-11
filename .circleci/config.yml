@@ -83,6 +83,13 @@ jobs:
             echo "export AWS_ACCESS_KEY_ID=$(echo $CREDS | jq -r '.Credentials.AccessKeyId')" >> "$BASH_ENV"
             echo "export AWS_SECRET_ACCESS_KEY=$(echo $CREDS | jq -r '.Credentials.SecretAccessKey')" >> "$BASH_ENV"
             echo "export AWS_SESSION_TOKEN=$(echo $CREDS | jq -r '.Credentials.SessionToken')" >> "$BASH_ENV"
+      - run:
+          name: Login to Amazon ECR
+          command: |
+            aws ecr get-login-password --region ap-northeast-2 \
+              | docker login \
+                  --username AWS \
+                  --password-stdin 445960198177.dkr.ecr.ap-northeast-2.amazonaws.com
 workflows:
   build-and-test:
     jobs:
