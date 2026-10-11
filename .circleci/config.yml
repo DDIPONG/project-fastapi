@@ -46,10 +46,23 @@ jobs:
           name: Update deployment status to failed
           command: circleci run release update deploy --status=FAILED
           when: on_fail
+  docker-build:
+    docker:
+      machine:
+        image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run:
+          name: Build Docker image
+          command: docker build -t project-fastapi .
+
 workflows:
   build-and-test:
     jobs:
       - test-python
-    # - deploy:
-    #     requires:
-    #       - test-python
+      # - deploy:
+      #     requires:
+      #       - test-python
+      - docker-build:
+          requires:
+            - test-python
