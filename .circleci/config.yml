@@ -72,10 +72,13 @@ jobs:
           name: Load Docker image
           command: docker load -i project-fastapi.tar
       - run:
-          name: Check OIDC token
+          name: Assume AWS IAM Role
           command: |
-            echo "$CIRCLE_OIDC_TOKEN_V2" | cut -d '.' -f2 | base64 -d 2>/dev/null | jq .
-
+            aws sts assume-role-with-web-identity \
+              --role-arn arn:aws:iam::445960198177:role/CircleCI-ECR-Push-Role \
+              --role-session-name circleci-${CIRCLE_WORKFLOW_ID} \
+              --web-identity-token "$CIRCLE_OIDC_TOKEN_V2" \
+              --duration-seconds 3600
 workflows:
   build-and-test:
     jobs:
